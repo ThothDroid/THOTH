@@ -18,4 +18,4 @@ instead of typing
 <v><h><sign id="500"/><sign id="500"/><sign id="500"/></h><h><sign id="500"/><sign id="500"/></h></v>
 ```
 ### Newest Version
-`06.10.2025@1.0.1`
+`26.10.2025@1.1.1`
