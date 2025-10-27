@@ -33,6 +33,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
+opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
 thoth = { module = "com.github.cristmasbox:THOTH", version.ref = "thoth" }
 maat = { module = "com.github.cristmasbox:MAAT", version.ref = "maat"}
 
