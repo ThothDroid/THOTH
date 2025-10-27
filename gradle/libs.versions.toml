@@ -12,6 +12,7 @@ composeBom = "2025.10.01"
 constraintlayout = "2.2.1"
 material = "1.13.0"
 thoth = "1.0.1"
+maat = "1.0.0"
 
 [libraries]
 android-keyboardlistener = { module = "com.github.ravindu1024:android-keyboardlistener", version.ref = "androidKeyboardlistener" }
