@@ -16,4 +16,6 @@
     <string name="switch_test_alt_text">test alt text</string>
     <string name="alt_text_size_title">"Alt Text Size: "</string>
     <string name="alt_Text_size_title_start">Alt Text Size: 30sp</string>
+    <string name="switch_mdc">MdC</string>
+    <string name="switch_glyphx">GlyphX</string>
 </resources>

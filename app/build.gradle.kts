@@ -10,8 +10,8 @@ android {
         applicationId = "com.blueapps.thothexampleapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 102
-        versionName = "06.10.2025@1.0.2"
+        versionCode = 111
+        versionName = "26.10.2025@1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
