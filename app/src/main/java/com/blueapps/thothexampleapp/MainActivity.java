@@ -7,8 +7,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blueapps.thothexampleapp.databinding.MainActivityBinding;
@@ -22,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private int textColorCursor = 0;
     private int bgColorCursor = 0;
     private int altTextCursor = 0;
+    private boolean MdCSwitch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -30,7 +34,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Define inputText
-        binding.inputText.setText(binding.thothView.getText());
+        if (binding.MdCSwitch.isActivated()){
+            binding.inputText.setText(binding.thothView.getGlyphXText());
+        } else {
+            binding.inputText.setText(binding.thothView.getMdCText());
+        }
         binding.inputText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
@@ -45,8 +53,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 TextChangerThread textChangerThread = new TextChangerThread(binding, false);
-                textChangerThread.setText(charSequence);
+                if (MdCSwitch){
+                    textChangerThread.setGlyphXText(charSequence);
+                } else {
+                    textChangerThread.setMdCText(charSequence);
+                }
                 textChangerThread.start();
+            }
+        });
+
+        // Define MdC Switch
+        binding.MdCSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            MdCSwitch = b;
+            if (b){
+                binding.inputText.setText(binding.thothView.getGlyphXText());
+            } else {
+                binding.inputText.setText(binding.thothView.getMdCText());
             }
         });
 
@@ -164,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                TextChangerThread textChangerThread = new TextChangerThread(binding, true);
-                textChangerThread.setText(charSequence);
-                textChangerThread.start();
+                binding.thothView.setAltText(charSequence.toString());
             }
         });
 

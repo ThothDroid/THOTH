@@ -18,5 +18,11 @@ instead of typing
 <v><h><sign id="500"/><sign id="500"/><sign id="500"/></h><h><sign id="500"/><sign id="500"/></h></v>
 ```
 ### 26.10.2025@1.1.1
+Support for MdC input added using the [GlyphConverter](https://github.com/cristmasbox/GlyphConverter) library.
+### 08.11.2025@2.0.0
+Support for brackets in MdC added. Now you can type in:
+```
+N17:i*(p:t)*(t:p)*i:N17
+```
 ### Newest Version
-`26.10.2025@1.1.1`
+`08.11.2025@2.0.0`

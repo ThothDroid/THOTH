@@ -10,8 +10,8 @@ android {
         applicationId = "com.blueapps.thothexampleapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 111
-        versionName = "26.10.2025@1.1.1"
+        versionCode = 200
+        versionName = "08.11.2025@2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,8 +37,8 @@ android {
 
 dependencies {
 
-    //implementation(project(":thoth"))
-    implementation(libs.thoth)
+    implementation(project(":thoth"))
+    //implementation(libs.thoth)
 
     implementation(libs.android.keyboardlistener)
     implementation(libs.androidx.core.ktx)
