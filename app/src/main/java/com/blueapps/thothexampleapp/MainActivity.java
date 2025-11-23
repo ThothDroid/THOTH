@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Define inputText
         if (binding.MdCSwitch.isActivated()){
-            binding.inputText.setText(binding.thothView.getGlyphXText());
+            binding.inputText.setText(binding.thothView.getGlyphXTextString());
         } else {
             binding.inputText.setText(binding.thothView.getMdCText());
         }
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         binding.MdCSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
             MdCSwitch = b;
             if (b){
-                binding.inputText.setText(binding.thothView.getGlyphXText());
+                binding.inputText.setText(binding.thothView.getGlyphXTextString());
             } else {
                 binding.inputText.setText(binding.thothView.getMdCText());
             }
