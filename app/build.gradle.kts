@@ -37,8 +37,8 @@ android {
 
 dependencies {
 
-    implementation(project(":thoth"))
-    //implementation(libs.thoth)
+    //implementation(project(":thoth"))
+    implementation(libs.thoth)
 
     implementation(libs.android.keyboardlistener)
     implementation(libs.androidx.core.ktx)
