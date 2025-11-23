@@ -26,5 +26,7 @@ N17:i*(p:t)*(t:p)*i:N17
 ```
 ### 08.11.2025@2.0.1
 Updated dependencies.
+### 23.11.2025@2.0.2
+Function for directly passing GlyphX XML document to ThothView.java added.
 ### Newest Version
-`08.11.2025@2.0.1`
+`23.11.2025@2.0.2`
