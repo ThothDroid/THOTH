@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.blueapps.thothexampleapp"
-        minSdk = 24
+        minSdk = 23
         targetSdk = 36
         versionCode = 202
         versionName = "23.11.2025@2.0.2"
