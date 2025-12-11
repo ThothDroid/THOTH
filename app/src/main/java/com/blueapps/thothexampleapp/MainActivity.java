@@ -96,6 +96,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Define writingDirection RadioGroup
+        binding.WritingDirection.setOnCheckedChangeListener((radioGroup, i) -> {
+            if (i == R.id.ltr){
+                binding.thothView.setWritingDirection(0);
+            } else if (i == R.id.rtl){
+                binding.thothView.setWritingDirection(1);
+            } else {
+                binding.thothView.setWritingDirection(0);
+            }
+        });
+
         // Define TextSize Seekbar
         binding.textSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -190,6 +201,156 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Lines
+        binding.lineThickness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.lineThicknessTitle.setText(getString(R.string.line_thickness_title) + i + "dp");
+                binding.thothView.setLineThickness(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        binding.drawLines.setOnCheckedChangeListener((compoundButton, b) -> {
+            binding.thothView.setDrawLines(b);
+        });
+
+        // Paddings
+        binding.paddingLeft.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.paddingLeftTitle.setText(getString(R.string.padding_left_title) + i + "dp");
+                binding.thothView.setPagePaddingLeft(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.paddingTop.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.paddingTopTitle.setText(getString(R.string.padding_top_title) + i + "dp");
+                binding.thothView.setPagePaddingTop(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.paddingRight.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.paddingRightTitle.setText(getString(R.string.padding_right_title) + i + "dp");
+                binding.thothView.setPagePaddingRight(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.paddingBottom.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.paddingBottomTitle.setText(getString(R.string.padding_bottom_title) + i + "dp");
+                binding.thothView.setPagePaddingBottom(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.signPadding.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.signPaddingTitle.setText(getString(R.string.sign_padding_title) + i + "dp");
+                binding.thothView.setSignPadding(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.layoutSignPadding.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.layoutSignPaddingTitle.setText(getString(R.string.layout_sign_padding_title) + i + "dp");
+                binding.thothView.setLayoutSignPadding(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        binding.interLinePadding.setProgress(pxToDp(25, this));
+        binding.interLinePadding.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                binding.interLinePaddingTitle.setText(getString(R.string.inter_line_padding) + i + "dp");
+                binding.thothView.setInterLinePadding(dpToPx(i, MainActivity.this));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         // some layout stuff
 
         KeyboardUtils.addKeyboardToggleListener(this, isVisible -> {
@@ -211,6 +372,16 @@ public class MainActivity extends AppCompatActivity {
 
     public static int spToPx(float sp, Context context) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+    }
+
+    public static int dpToPx(float dpValue, Context context) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static int pxToDp(float pxValue, Context context) {
+        final float scale =  context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
     }
 
 }

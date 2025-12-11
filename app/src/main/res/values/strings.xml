@@ -18,4 +18,17 @@
     <string name="alt_Text_size_title_start">Alt Text Size: 30sp</string>
     <string name="switch_mdc">MdC</string>
     <string name="switch_glyphx">GlyphX</string>
+    <string name="writing_direction_ltr">left to right</string>
+    <string name="writing_direction_rtl">right to left</string>
+    <string name="default_text">r:Z1-n:km-m-t:O49</string>
+    <string name="draw_lines_title">Draw Lines</string>
+    <string name="line_thickness_title">"Line Thickness: "</string>
+    <string name="padding_title">Padding</string>
+    <string name="padding_left_title">"Left: "</string>
+    <string name="padding_top_title">"Top: "</string>
+    <string name="padding_right_title">"Right: "</string>
+    <string name="padding_bottom_title">"Bottom: "</string>
+    <string name="sign_padding_title">"Sign Padding: "</string>
+    <string name="layout_sign_padding_title">"Layout Sign Padding: "</string>
+    <string name="inter_line_padding">"Inter Line Padding: "</string>
 </resources>
