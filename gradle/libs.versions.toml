@@ -38,9 +38,9 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
-maat = { module = "com.github.cristmasbox:MAAT", version.ref = "maat"}
-signprovider = { group = "com.github.cristmasbox", name = "SignProvider", version.ref = "signprovider"}
-thoth = { module = "com.github.cristmasbox:THOTH", version.ref = "thoth" }
+maat = { module = "com.github.ThothDroid:MAAT", version.ref = "maat"}
+signprovider = { group = "com.github.ThothDroid", name = "SignProvider", version.ref = "signprovider"}
+thoth = { module = "com.github.ThothDroid:THOTH", version.ref = "thoth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
