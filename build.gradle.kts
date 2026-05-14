@@ -46,6 +46,7 @@ android {
 
 dependencies {
 
+    println("DEBUG: newer version")
     // custom libraries
     implementation(libs.maat)
     implementation(libs.glyphconverter)
