@@ -4,6 +4,7 @@ import static com.blueapps.maat.BoundProperty.WRITING_DIRECTION_RTL;
 import static com.blueapps.thoth.RenderClass.convertToXmlDocument;
 import static com.blueapps.thoth.RenderClass.convertToXmlString;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -25,6 +26,8 @@ import com.blueapps.glpyhconverter.GlyphConverter;
 import com.blueapps.glpyhconverter.toglyphx.exceptions.MdCParseException;
 import com.blueapps.maat.BoundProperty;
 import com.blueapps.thoth.cache.CacheStorage;
+import com.blueapps.thoth.cache.DrawableCache;
+import com.blueapps.thoth.cache.Storage;
 
 import org.w3c.dom.Document;
 
@@ -55,11 +58,14 @@ public class ThothView extends View implements RunnableListener {
     //private TaskScheduler taskScheduler;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    private CacheStorage storage;
     private RenderClass renderClass;
+
+    private Storage storage = null;
+    private DrawableCache drawableCache;
 
     // Paints
     private final Paint textPaint = new Paint();
+    private final Paint placeholderPaint = new Paint();
 
     // Attributes
     private Document glyphX;
@@ -138,27 +144,30 @@ public class ThothView extends View implements RunnableListener {
 
     @Override
     protected void onAttachedToWindow() {
-        // For Android Studio Preview Render
         try {
 
             super.onAttachedToWindow();
 
-            ViewModelStoreOwner owner = ViewTreeViewModelStoreOwner.get(this);
-            if (owner != null && (storage == null || renderClass == null)) {
-                storage = new ViewModelProvider(owner).get(CacheStorage.class);
-                renderClass = new ViewModelProvider(owner).get(RenderClass.class);
-            }
+            // Init Drawable Cache
+            ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+            int availableMemory = am.getMemoryClass() * 1024 * 1024; // Available Memory in bytes
+            drawableCache = new DrawableCache(availableMemory / 8); // For some security
 
-            renderClass.setParams(this);
-            storage.setParams(this.getContext(), renderClass, listener);
+            // Inform Listener
+            if (listener != null) listener.OnRenderStart();
+
+            /*renderClass.setParams(this);
             setGlyphXText(glyphX);
 
             //taskScheduler = new TaskScheduler();
             renderRunnable = new RenderRunnable(this, renderClass, this);
-            render();
+            render();*/
 
+            // Init Paints
             textPaint.setTextSize(altTextSize);
             textPaint.setColor(altTextColor);
+
+            placeholderPaint.setColor(primarySignColor);
 
         } catch (NullPointerException e){
             e.printStackTrace();
@@ -172,26 +181,36 @@ public class ThothView extends View implements RunnableListener {
                 Color.green(backgroundColor),
                 Color.blue(backgroundColor));
 
-        if (unlockDrawing){
+        if (unlockDrawing && storage != null){
             int counter = 0;
             for (String id : storage.getIds()) {
-                Drawable drawable = storage.getDrawable(id, storage.getIds().size());
+                // Get Drawable
+                Drawable drawable = drawableCache.getDrawable(id);
                 Rect bound = storage.getBounds().get(counter);
-                drawable.setBounds(bound);
-                if (writingDirection == WRITING_DIRECTION_RTL){
-                    canvas.save();
-                    // Flip canvas
-                    canvas.scale(-1f, 1f, bound.centerX(), bound.centerY());
-                }
-                if (drawable instanceof VectorDrawable){
-                    VectorDrawable drawable1 = (VectorDrawable) drawable;
-                    drawable1.setTint(primarySignColor);
-                    drawable1.draw(canvas);
+                if (drawable != null) {
+                    drawable.setBounds(bound);
+                    if (writingDirection == WRITING_DIRECTION_RTL) {
+                        canvas.save();
+                        // Flip canvas
+                        canvas.scale(-1f, 1f, bound.centerX(), bound.centerY());
+                    }
+                    if (drawable instanceof VectorDrawable) {
+                        VectorDrawable vectorDrawable = (VectorDrawable) drawable;
+                        vectorDrawable.setTint(primarySignColor);
+                        vectorDrawable.draw(canvas);
+                    } else {
+                        drawable.draw(canvas);
+                    }
+                    if (writingDirection == WRITING_DIRECTION_RTL) {
+                        canvas.restore();
+                    }
                 } else {
-                    drawable.draw(canvas);
-                }
-                if (writingDirection == WRITING_DIRECTION_RTL){
-                    canvas.restore();
+                    // If the drawable is not in the cache, it has been removed due to low memory
+                    // Inform listener
+                    if (listener != null) listener.OnMemoryOverload();
+
+                    // Draw placeholder
+                    canvas.drawRect(bound, placeholderPaint);
                 }
                 counter++;
             }
