@@ -14,7 +14,6 @@ import java.util.ArrayList;
 public class Storage {
 
     // Cached Values
-    private String glyphXContent;
     private Document glyphXDocument;
     private BoundCalculation boundCalculation;
     private ArrayList<String> ids;
@@ -22,8 +21,6 @@ public class Storage {
     private ArrayList<Rect> bounds;
 
     // Getters
-
-
     public ArrayList<Rect> getBounds() {
         return bounds;
     }
@@ -44,7 +41,24 @@ public class Storage {
         return glyphXDocument;
     }
 
-    public String getGlyphXContent() {
-        return glyphXContent;
+    // Setters
+    public void setGlyphXDocument(Document glyphXDocument) {
+        this.glyphXDocument = glyphXDocument;
+    }
+
+    public void setBoundCalculation(BoundCalculation boundCalculation) {
+        this.boundCalculation = boundCalculation;
+    }
+
+    public void setIds(ArrayList<String> ids) {
+        this.ids = ids;
+    }
+
+    public void setDimensions(ArrayList<ValuePair<Float, Float>> dimensions) {
+        this.dimensions = dimensions;
+    }
+
+    public void setBounds(ArrayList<Rect> bounds) {
+        this.bounds = bounds;
     }
 }

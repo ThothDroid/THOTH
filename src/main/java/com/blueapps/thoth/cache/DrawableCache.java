@@ -22,4 +22,8 @@ public class DrawableCache {
         return drawableLruCache.get(id);
     }
 
+    public void putDrawable(String id, Drawable drawable){
+        drawableLruCache.put(id, drawable);
+    }
+
 }

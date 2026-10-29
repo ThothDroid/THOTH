@@ -1,8 +1,7 @@
 package com.blueapps.thoth;
 
 import static com.blueapps.maat.BoundProperty.WRITING_DIRECTION_RTL;
-import static com.blueapps.thoth.RenderClass.convertToXmlDocument;
-import static com.blueapps.thoth.RenderClass.convertToXmlString;
+import static com.blueapps.thoth.render.RenderClass.convertToXmlString;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -18,25 +17,23 @@ import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.lifecycle.ViewTreeViewModelStoreOwner;
 
 import com.blueapps.glpyhconverter.GlyphConverter;
 import com.blueapps.glpyhconverter.toglyphx.exceptions.MdCParseException;
 import com.blueapps.maat.BoundProperty;
-import com.blueapps.thoth.cache.CacheStorage;
 import com.blueapps.thoth.cache.DrawableCache;
 import com.blueapps.thoth.cache.Storage;
+import com.blueapps.thoth.render.RenderClass;
+import com.blueapps.thoth.render.RenderThread;
+import com.blueapps.thoth.render.StorageUpdater;
 
 import org.w3c.dom.Document;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
 
 import javax.xml.transform.TransformerException;
 
-public class ThothView extends View implements RunnableListener {
+public class ThothView extends View implements RenderThread.Result {
 
     // Constants
     private static final String TAG = "ThothView";
@@ -53,15 +50,11 @@ public class ThothView extends View implements RunnableListener {
     protected boolean unlockDrawing = false;
 
     private ThothListener listener = null;
-
-    private RenderRunnable renderRunnable;
-    //private TaskScheduler taskScheduler;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    private RenderClass renderClass;
-
+    private final RenderThread renderThread = new RenderThread();
     private Storage storage = null;
     private DrawableCache drawableCache;
+    private BoundProperty property;
+    private final ArrayList<Integer> cacheChanges = new ArrayList<>();
 
     // Paints
     private final Paint textPaint = new Paint();
@@ -153,15 +146,17 @@ public class ThothView extends View implements RunnableListener {
             int availableMemory = am.getMemoryClass() * 1024 * 1024; // Available Memory in bytes
             drawableCache = new DrawableCache(availableMemory / 8); // For some security
 
+            renderThread.start();
+
+            property = new BoundProperty(0, 0, textSize,
+                    verticalOrientation, writingDirection, writingLayout,
+                    drawLines, lineThickness, pagePaddingLeft, pagePaddingTop, pagePaddingRight,
+                    pagePaddingBottom, signPadding, layoutSignPadding, interLinePadding);
+
             // Inform Listener
             if (listener != null) listener.OnRenderStart();
 
-            /*renderClass.setParams(this);
-            setGlyphXText(glyphX);
-
-            //taskScheduler = new TaskScheduler();
-            renderRunnable = new RenderRunnable(this, renderClass, this);
-            render();*/
+            renderThread.submit(new StorageUpdater(getContext(), drawableCache, glyphX, property), this);
 
             // Init Paints
             textPaint.setTextSize(altTextSize);
@@ -261,10 +256,6 @@ public class ThothView extends View implements RunnableListener {
         setMeasuredDimension(mWidth, mHeight);
     }
 
-    public CacheStorage getStorage(){
-        return storage;
-    }
-
     public String getMdCText(){
         return MdC;
     }
@@ -286,8 +277,7 @@ public class ThothView extends View implements RunnableListener {
         this.MdC = mdc;
         try {
             this.glyphX = GlyphConverter.convertToGlyphXDocument(mdc);
-            storage.setGlyphXDocument(glyphX);
-            storage.refreshCache();
+            cacheChanges.add(StorageUpdater.REFRESH_ALL);
             render();
         } catch (Exception e){
             e.printStackTrace();
@@ -296,10 +286,9 @@ public class ThothView extends View implements RunnableListener {
 
     public void setGlyphXText(String glyphX){
         try {
-            this.glyphX = convertToXmlDocument(glyphX);
+            this.glyphX = RenderClass.renderGlyphXDocument(glyphX);
             this.MdC = GlyphConverter.convertToMdC(glyphX);
-            storage.setGlyphXContent(glyphX);
-            storage.refreshCache();
+            cacheChanges.add(StorageUpdater.REFRESH_ALL);
             render();
         } catch (Exception e){
             e.printStackTrace();
@@ -310,8 +299,7 @@ public class ThothView extends View implements RunnableListener {
         try {
             this.glyphX = glyphXDocument;
             this.MdC = GlyphConverter.convertToMdC(glyphX);
-            storage.setGlyphXDocument(glyphXDocument);
-            storage.refreshCache();
+            cacheChanges.add(StorageUpdater.REFRESH_ALL);
             render();
         } catch (Exception e){
             e.printStackTrace();
@@ -324,7 +312,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setTextSize(int textSize){
         this.textSize = textSize;
-        if(storage != null) storage.clearLayoutCache();
+        property.setTextSize(textSize);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -335,7 +324,8 @@ public class ThothView extends View implements RunnableListener {
     public void setVerticalOrientation(int verticalOrientation){
         if (verticalOrientation < 3 && verticalOrientation > -1) {
             this.verticalOrientation = verticalOrientation;
-            if(storage != null) storage.clearLayoutCache();
+            property.setVerticalOrientation(verticalOrientation);
+            cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
             render();
         }
     }
@@ -347,7 +337,8 @@ public class ThothView extends View implements RunnableListener {
     public void setWritingDirection(int writingDirection){
         if (writingDirection == 0 || writingDirection == 1){
             this.writingDirection = writingDirection;
-            if(storage != null) storage.clearDirectionCache();
+            property.setWritingDirection(writingDirection);
+            cacheChanges.add(StorageUpdater.REFRESH_DIRECTION);
             render();
         }
     }
@@ -359,7 +350,8 @@ public class ThothView extends View implements RunnableListener {
     public void setWritingLayout(int writingLayout){
         if (writingLayout == 0 || writingLayout == 1){
             this.writingLayout = writingLayout;
-            if(storage != null) storage.clearLayoutCache();
+            property.setWritingLayout(writingLayout);
+            cacheChanges.add(StorageUpdater.REFRESH_DIRECTION);
             render();
         }
     }
@@ -370,6 +362,7 @@ public class ThothView extends View implements RunnableListener {
 
     public void setPrimarySignColor(@ColorInt int color){
         this.primarySignColor = color;
+        placeholderPaint.setColor(color);
         this.invalidate();
     }
 
@@ -408,9 +401,7 @@ public class ThothView extends View implements RunnableListener {
 
     public void testAltText(boolean b){
         this.testAltText = b;
-        if(storage != null) storage.clearLayoutCache();
-        render();
-        unlockDrawing = false;
+        unlockDrawing = !b;
         this.requestLayout();
         this.invalidate();
     }
@@ -442,8 +433,9 @@ public class ThothView extends View implements RunnableListener {
 
     public void setLineThickness(float lineThickness) {
         this.lineThickness = lineThickness;
+        property.setLineThickness(lineThickness);
         if (isDrawLines()) {
-            if(storage != null) storage.clearLayoutCache();
+            cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
             render();
         }
     }
@@ -454,7 +446,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setDrawLines(boolean drawLines) {
         this.drawLines = drawLines;
-        if(storage != null) storage.clearLayoutCache();
+        property.setDrawLines(drawLines);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -464,7 +457,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setPagePaddingLeft(float pagePaddingLeft) {
         this.pagePaddingLeft = pagePaddingLeft;
-        if(storage != null) storage.clearLayoutCache();
+        property.setPagePaddingLeft(pagePaddingLeft);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -474,7 +468,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setPagePaddingTop(float pagePaddingTop) {
         this.pagePaddingTop = pagePaddingTop;
-        if(storage != null) storage.clearLayoutCache();
+        property.setPagePaddingTop(pagePaddingTop);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -484,7 +479,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setPagePaddingRight(float pagePaddingRight) {
         this.pagePaddingRight = pagePaddingRight;
-        if(storage != null) storage.clearLayoutCache();
+        property.setPagePaddingRight(pagePaddingRight);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -494,7 +490,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setPagePaddingBottom(float pagePaddingBottom) {
         this.pagePaddingBottom = pagePaddingBottom;
-        if(storage != null) storage.clearLayoutCache();
+        property.setPagePaddingBottom(pagePaddingBottom);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -504,7 +501,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setSignPadding(float signPadding) {
         this.signPadding = signPadding;
-        if(storage != null) storage.clearLayoutCache();
+        property.setSignPadding(signPadding);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -514,7 +512,8 @@ public class ThothView extends View implements RunnableListener {
 
     public void setLayoutSignPadding(float layoutSignPadding) {
         this.layoutSignPadding = layoutSignPadding;
-        if(storage != null) storage.clearLayoutCache();
+        property.setLayoutSignPadding(layoutSignPadding);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
@@ -524,40 +523,30 @@ public class ThothView extends View implements RunnableListener {
 
     public void setInterLinePadding(float interLinePadding) {
         this.interLinePadding = interLinePadding;
-        if(storage != null) storage.clearLayoutCache();
+        property.setInterLinePadding(interLinePadding);
+        cacheChanges.add(StorageUpdater.REFRESH_LAYOUT);
         render();
     }
 
+
+    private void render(){
+        if (listener != null) listener.OnRenderStart();
+
+        renderThread.submit(new StorageUpdater(storage, cacheChanges, getContext(), drawableCache, glyphX, property), this);
+    }
 
     public void setThothListener(ThothListener listener){
         this.listener = listener;
     }
 
-    public void cancelRender(){
-        if (listener != null) listener.OnRenderCancel();
-        //taskScheduler.shutdown();
-        executorService.shutdownNow();
-        if (storage != null) storage.refreshCache();
-    }
 
-
-    private void render(){
-        //cancelRender();
-        if (renderRunnable != null) executorService.submit(renderRunnable);
-        //taskScheduler.addTask(renderRunnable);
-    }
-
-    // Runnable Listener
+    // Result listener
     @Override
-    public void onRunnableStart() {
-        if (listener != null) listener.OnRenderStart();
-    }
-
-    @Override
-    public void onRunnableFinish() {
+    public void result(Storage storage) {
+        this.storage = storage;
+        // Clear changes, because they are already in this result
+        cacheChanges.clear();
+        invalidate();
         if (listener != null) listener.OnRenderFinished();
-        //taskScheduler.onFinish();
     }
-
-
 }
