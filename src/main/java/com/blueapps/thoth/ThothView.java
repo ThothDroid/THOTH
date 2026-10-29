@@ -219,8 +219,14 @@ public class ThothView extends View implements RenderThread.Result {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        height = (int) storage.getBoundCalculation().getHeight();
-        width = (int) storage.getBoundCalculation().getWidth();
+        if (storage != null) {
+            height = (int) storage.getBoundCalculation().getHeight();
+            width = (int) storage.getBoundCalculation().getWidth();
+        } else {
+            // Basic preview dimensions until BoundCalculation is ready
+            height = textSize;
+            width = textSize * 4;
+        }
 
         if (!unlockDrawing && showAltText){
             width = (int) textPaint.measureText(altText);
@@ -547,6 +553,7 @@ public class ThothView extends View implements RenderThread.Result {
         // Clear changes, because they are already in this result
         cacheChanges.clear();
         invalidate();
+        requestLayout();
         if (listener != null) listener.OnRenderFinished();
     }
 }
