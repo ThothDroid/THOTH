@@ -5,4 +5,4 @@ This documentation aims to increase the understanding of the code, by providing 
 ## ThothCaching
 This diagram shows the Caching system of the Thoth Library. The UI is starting the View and the USER is changing values.
 
-![](ThothCaching.jpg)
+![](/ThothCaching.jpg)
