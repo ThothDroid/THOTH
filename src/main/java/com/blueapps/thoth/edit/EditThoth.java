@@ -132,6 +132,8 @@ public class EditThoth extends ThothView implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onSingleTapUp(@NonNull MotionEvent motionEvent) {
+        xCursorPosition = SnappingCursor.snapToSigns(xCursorPosition, storage.getBounds()) - cursorStrength / 2;
+        invalidate();
         return true;
     }
 }

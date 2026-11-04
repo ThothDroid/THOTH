@@ -51,7 +51,7 @@ public class ThothView extends View implements RenderThread.Result {
 
     private ThothListener listener = null;
     private final RenderThread renderThread = new RenderThread();
-    private Storage storage = null;
+    protected Storage storage = null;
     private DrawableCache drawableCache;
     private BoundProperty property;
     private final ArrayList<Integer> cacheChanges = new ArrayList<>();
