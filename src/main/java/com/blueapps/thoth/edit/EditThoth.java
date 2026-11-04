@@ -17,12 +17,14 @@ import com.blueapps.thoth.ThothView;
 public class EditThoth extends ThothView implements GestureDetector.OnGestureListener {
 
     private GestureDetector gestureDetector;
+    private float xCursorPosition = 0f;
 
     // Paints
     private final Paint cursorPaint = new Paint();
 
     // Attributes
     private @ColorInt int cursorColor = Color.BLUE;
+    private float cursorStrength = 5f;
 
     public EditThoth(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -52,7 +54,7 @@ public class EditThoth extends ThothView implements GestureDetector.OnGestureLis
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawRect(0, 0, 5, getTextSize(), cursorPaint);
+        canvas.drawRect(xCursorPosition, 0, xCursorPosition + cursorStrength, getTextSize(), cursorPaint);
     }
 
     @Override
@@ -72,9 +74,20 @@ public class EditThoth extends ThothView implements GestureDetector.OnGestureLis
         invalidate();
     }
 
+    public float getCursorStrength() {
+        return cursorStrength;
+    }
+
+    public void setCursorStrength(float cursorStrength) {
+        this.cursorStrength = cursorStrength;
+        invalidate();
+    }
+
     // Gesture Listener
     @Override
     public boolean onDown(@NonNull MotionEvent motionEvent) {
+        xCursorPosition = motionEvent.getX();
+        invalidate();
         return true;
     }
 
