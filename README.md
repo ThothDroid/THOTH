@@ -25,6 +25,9 @@ A library for converting GlyphX to MdC and back is stored here: [GlyphConverter]
 > **If you only want to calculate the Dimensions and Positions (`Bounds`) of each sign**, then you can use the `MAAT`-library:\
 > [ThothDroid/MAAT](https://github.com/ThothDroid/MAAT)
 
+## Development
+My private notes about the code structure are in the [structure](./structure/) folder.
+
 ## Implementation with jitpack
 Add this to your `settings.gradle.kts` at the end of repositories:
 ```
