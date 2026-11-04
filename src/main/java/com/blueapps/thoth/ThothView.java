@@ -75,10 +75,10 @@ public class ThothView extends View implements RenderThread.Result {
     private int writingLayout = BoundProperty.WRITING_LAYOUT_LINES;
     private boolean drawLines = false;
     private float lineThickness = 2f;
-    private float pagePaddingLeft = 0f;
-    private float pagePaddingTop = 0f;
-    private float pagePaddingRight = 0f;
-    private float pagePaddingBottom = 0f;
+    protected float pagePaddingLeft = 0f;
+    protected float pagePaddingTop = 0f;
+    protected float pagePaddingRight = 0f;
+    protected float pagePaddingBottom = 0f;
     private float signPadding = 0f;
     private float layoutSignPadding = 0f;
     private float interLinePadding = 25f;

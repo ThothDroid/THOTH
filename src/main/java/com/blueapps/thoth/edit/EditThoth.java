@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.ColorKt;
 
 import com.blueapps.thoth.ThothView;
 
@@ -21,10 +22,11 @@ public class EditThoth extends ThothView implements GestureDetector.OnGestureLis
 
     // Paints
     private final Paint cursorPaint = new Paint();
+    private final Paint selectionPaint = new Paint();
 
     // Attributes
     private @ColorInt int cursorColor = Color.BLUE;
-    private float cursorStrength = 5f;
+    private float cursorStrength = 7.5f;
 
     public EditThoth(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -48,19 +50,36 @@ public class EditThoth extends ThothView implements GestureDetector.OnGestureLis
 
     private void constructor(){
         cursorPaint.setColor(cursorColor);
+        selectionPaint.setColor(Color.argb(50, ColorKt.getRed(cursorColor), ColorKt.getGreen(cursorColor), ColorKt.getBlue(cursorColor)));
         gestureDetector = new GestureDetector(getContext(), this);
+        pagePaddingRight = pagePaddingRight + 100f;
     }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawRect(xCursorPosition, 0, xCursorPosition + cursorStrength, getTextSize(), cursorPaint);
+
+        //canvas.drawRect(xCursorPosition - 100, 0, xCursorPosition + cursorStrength,
+                //getTextSize(), selectionPaint);
+
+        canvas.drawRoundRect(xCursorPosition, 0, xCursorPosition + cursorStrength,
+                getTextSize(), cursorStrength / 2, cursorStrength / 2, cursorPaint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetector.onTouchEvent(event);
         return true;
+    }
+
+    @Override
+    public void setPagePaddingRight(float pagePaddingRight) {
+        super.setPagePaddingRight(pagePaddingRight + 100f);
+    }
+
+    @Override
+    public float getPagePaddingRight() {
+        return super.getPagePaddingRight() - 100f;
     }
 
     // Getter and Setter
