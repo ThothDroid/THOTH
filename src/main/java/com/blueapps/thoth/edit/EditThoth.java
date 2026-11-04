@@ -5,13 +5,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.blueapps.thoth.ThothView;
 
-public class EditThoth extends ThothView {
+public class EditThoth extends ThothView implements GestureDetector.OnGestureListener {
+
+    private GestureDetector gestureDetector;
 
     // Paints
     private final Paint cursorPaint = new Paint();
@@ -41,6 +46,7 @@ public class EditThoth extends ThothView {
 
     private void constructor(){
         cursorPaint.setColor(cursorColor);
+        gestureDetector = new GestureDetector(getContext(), this);
     }
 
     @Override
@@ -49,6 +55,13 @@ public class EditThoth extends ThothView {
         canvas.drawRect(0, 0, 5, getTextSize(), cursorPaint);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    // Getter and Setter
     public int getCursorColor() {
         return cursorColor;
     }
@@ -57,5 +70,36 @@ public class EditThoth extends ThothView {
         this.cursorColor = cursorColor;
         cursorPaint.setColor(cursorColor);
         invalidate();
+    }
+
+    // Gesture Listener
+    @Override
+    public boolean onDown(@NonNull MotionEvent motionEvent) {
+        return true;
+    }
+
+    @Override
+    public boolean onFling(@Nullable MotionEvent motionEvent, @NonNull MotionEvent motionEvent1, float v, float v1) {
+        return true;
+    }
+
+    @Override
+    public void onLongPress(@NonNull MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onScroll(@Nullable MotionEvent motionEvent, @NonNull MotionEvent motionEvent1, float v, float v1) {
+        return true;
+    }
+
+    @Override
+    public void onShowPress(@NonNull MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(@NonNull MotionEvent motionEvent) {
+        return true;
     }
 }
